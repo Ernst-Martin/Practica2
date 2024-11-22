@@ -23,6 +23,77 @@ const getFiles = async () => {
     response.value = { error: "No se pudo obtener la lista de archivos." };
   }
 };
+
+// Función para almacenar un archivo (POST /api/hello)
+const storeFile = async () => {
+  if (!filename.value.trim() || !inputData.value.trim()) {
+    response.value = { error: "El nombre del archivo y el contenido son obligatorios." };
+    return;
+  }
+
+  try {
+    const res = await axios.post("http://localhost:8000/api/hello", {
+      filename: filename.value,
+      content: inputData.value,
+    }); // Llama a la API REST con el nombre del archivo y su contenido
+
+    response.value = res.data; // Actualiza la respuesta con los datos obtenidos
+  } catch (error) {
+    console.error("Error almacenando archivo:", error);
+    response.value = { error: "No se pudo almacenar el archivo." };
+  }
+};
+
+// Función para mostrar el contenido de un archivo (GET /api/hello/{filename})
+const showFile = async () => {
+  if (!filename.value.trim()) {
+    response.value = { error: "El nombre del archivo es obligatorio." };
+    return;
+  }
+
+  try {
+    const res = await axios.get(`http://localhost:8000/api/hello/${filename.value}`); // Llama a la API REST
+    response.value = res.data; // Actualiza la respuesta con los datos obtenidos
+  } catch (error) {
+    console.error("Error mostrando archivo:", error);
+    response.value = { error: "No se pudo mostrar el archivo." };
+  }
+};
+
+// Función para actualizar un archivo (PUT /api/hello/{filename})
+const updateFile = async () => {
+  if (!filename.value.trim() || !inputData.value.trim()) {
+    response.value = { error: "El nombre del archivo y el contenido son obligatorios para actualizar." };
+    return;
+  }
+
+  try {
+    const res = await axios.put(`http://localhost:8000/api/hello/${filename.value}`, {
+      content: inputData.value,
+    }); // Llama a la API REST para actualizar el archivo
+
+    response.value = res.data; // Actualiza la respuesta con los datos obtenidos
+  } catch (error) {
+    console.error("Error actualizando archivo:", error);
+    response.value = { error: "No se pudo actualizar el archivo." };
+  }
+};
+
+// Función para eliminar un archivo (DELETE /api/hello/{filename})
+const deleteFile = async () => {
+  if (!filename.value.trim()) {
+    response.value = { error: "El nombre del archivo es obligatorio para eliminar." };
+    return;
+  }
+
+  try {
+    const res = await axios.delete(`http://localhost:8000/api/hello/${filename.value}`); // Llama a la API REST para eliminar el archivo
+    response.value = res.data; // Actualiza la respuesta con los datos obtenidos
+  } catch (error) {
+    console.error("Error eliminando archivo:", error);
+    response.value = { error: "No se pudo eliminar el archivo." };
+  }
+};
 </script>
 
 <template>
@@ -46,12 +117,24 @@ const getFiles = async () => {
       <div>
         <div class="buttons">
           <button @click="getFiles">Get Files</button>
-          <button>Store</button>
-          <button>Show</button>
-          <button>Update</button>
-          <button>Delete</button>
+          <button @click="storeFile">Store</button>
+          <button @click="showFile">Show</button>
+          <button @click="updateFile">Update</button>
+          <button @click="deleteFile">Delete</button>
         </div>
-        <textarea readonly>{{ JSON.stringify(response, null, 2) }}</textarea>
+        <textarea
+          placeholder="Respuesta del servidor"
+          readonly
+        >{{ JSON.stringify(response, null, 2) }}</textarea>
+        <input
+          type="text"
+          v-model="filename"
+          placeholder="Nombre del archivo"
+        />
+        <textarea
+          v-model="inputData"
+          placeholder="Contenido del archivo"
+        ></textarea>
         <button>Send</button>
       </div>
     </section>
@@ -107,6 +190,14 @@ textarea {
   width: 100%;
   height: 100px;
   margin-bottom: 1rem;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
 button {
