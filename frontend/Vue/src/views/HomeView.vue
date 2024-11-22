@@ -13,18 +13,17 @@ const inputData = ref("");
 // Respuesta inicial (vacía)
 const response = ref({});
 
-// Función para obtener archivos (GET /api/hello)
+// Funciones para los archivos en **Class Storage**
 const getFiles = async () => {
   try {
-    const res = await axios.get("http://localhost:8000/api/hello"); // Llama a la API REST
-    response.value = res.data; // Actualiza la respuesta con los datos obtenidos
+    const res = await axios.get("http://localhost:8000/api/hello"); // Llama a la API REST de Hello
+    response.value = res.data;
   } catch (error) {
     console.error("Error obteniendo archivos:", error);
     response.value = { error: "No se pudo obtener la lista de archivos." };
   }
 };
 
-// Función para almacenar un archivo (POST /api/hello)
 const storeFile = async () => {
   if (!filename.value.trim() || !inputData.value.trim()) {
     response.value = { error: "El nombre del archivo y el contenido son obligatorios." };
@@ -35,16 +34,14 @@ const storeFile = async () => {
     const res = await axios.post("http://localhost:8000/api/hello", {
       filename: filename.value,
       content: inputData.value,
-    }); // Llama a la API REST con el nombre del archivo y su contenido
-
-    response.value = res.data; // Actualiza la respuesta con los datos obtenidos
+    });
+    response.value = res.data;
   } catch (error) {
     console.error("Error almacenando archivo:", error);
     response.value = { error: "No se pudo almacenar el archivo." };
   }
 };
 
-// Función para mostrar el contenido de un archivo (GET /api/hello/{filename})
 const showFile = async () => {
   if (!filename.value.trim()) {
     response.value = { error: "El nombre del archivo es obligatorio." };
@@ -52,15 +49,14 @@ const showFile = async () => {
   }
 
   try {
-    const res = await axios.get(`http://localhost:8000/api/hello/${filename.value}`); // Llama a la API REST
-    response.value = res.data; // Actualiza la respuesta con los datos obtenidos
+    const res = await axios.get(`http://localhost:8000/api/hello/${filename.value}`);
+    response.value = res.data;
   } catch (error) {
     console.error("Error mostrando archivo:", error);
     response.value = { error: "No se pudo mostrar el archivo." };
   }
 };
 
-// Función para actualizar un archivo (PUT /api/hello/{filename})
 const updateFile = async () => {
   if (!filename.value.trim() || !inputData.value.trim()) {
     response.value = { error: "El nombre del archivo y el contenido son obligatorios para actualizar." };
@@ -70,16 +66,14 @@ const updateFile = async () => {
   try {
     const res = await axios.put(`http://localhost:8000/api/hello/${filename.value}`, {
       content: inputData.value,
-    }); // Llama a la API REST para actualizar el archivo
-
-    response.value = res.data; // Actualiza la respuesta con los datos obtenidos
+    });
+    response.value = res.data;
   } catch (error) {
     console.error("Error actualizando archivo:", error);
     response.value = { error: "No se pudo actualizar el archivo." };
   }
 };
 
-// Función para eliminar un archivo (DELETE /api/hello/{filename})
 const deleteFile = async () => {
   if (!filename.value.trim()) {
     response.value = { error: "El nombre del archivo es obligatorio para eliminar." };
@@ -87,11 +81,87 @@ const deleteFile = async () => {
   }
 
   try {
-    const res = await axios.delete(`http://localhost:8000/api/hello/${filename.value}`); // Llama a la API REST para eliminar el archivo
-    response.value = res.data; // Actualiza la respuesta con los datos obtenidos
+    const res = await axios.delete(`http://localhost:8000/api/hello/${filename.value}`);
+    response.value = res.data;
   } catch (error) {
     console.error("Error eliminando archivo:", error);
     response.value = { error: "No se pudo eliminar el archivo." };
+  }
+};
+
+// Funciones para los archivos en **JSON**
+const getJsonFiles = async () => {
+  try {
+    const res = await axios.get("http://localhost:8000/api/json"); // Llama a la API REST para obtener la lista de archivos JSON
+    response.value = res.data;
+  } catch (error) {
+    console.error("Error obteniendo archivos JSON:", error);
+    response.value = { error: "No se pudo obtener la lista de archivos JSON." };
+  }
+};
+
+const storeJsonFile = async () => {
+  if (!filename.value.trim() || !inputData.value.trim()) {
+    response.value = { error: "El nombre del archivo y el contenido son obligatorios." };
+    return;
+  }
+
+  try {
+    const res = await axios.post("http://localhost:8000/api/json", {
+      filename: filename.value,
+      content: inputData.value,
+    });
+    response.value = res.data;
+  } catch (error) {
+    console.error("Error almacenando archivo JSON:", error);
+    response.value = { error: "No se pudo almacenar el archivo JSON." };
+  }
+};
+
+const showJsonFile = async () => {
+  if (!filename.value.trim()) {
+    response.value = { error: "El nombre del archivo JSON es obligatorio." };
+    return;
+  }
+
+  try {
+    const res = await axios.get(`http://localhost:8000/api/json/${filename.value}`);
+    response.value = res.data;
+  } catch (error) {
+    console.error("Error mostrando archivo JSON:", error);
+    response.value = { error: "No se pudo mostrar el archivo JSON." };
+  }
+};
+
+const updateJsonFile = async () => {
+  if (!filename.value.trim() || !inputData.value.trim()) {
+    response.value = { error: "El nombre del archivo y el contenido son obligatorios para actualizar." };
+    return;
+  }
+
+  try {
+    const res = await axios.put(`http://localhost:8000/api/json/${filename.value}`, {
+      content: inputData.value,
+    });
+    response.value = res.data;
+  } catch (error) {
+    console.error("Error actualizando archivo JSON:", error);
+    response.value = { error: "No se pudo actualizar el archivo JSON." };
+  }
+};
+
+const deleteJsonFile = async () => {
+  if (!filename.value.trim()) {
+    response.value = { error: "El nombre del archivo JSON es obligatorio para eliminar." };
+    return;
+  }
+
+  try {
+    const res = await axios.delete(`http://localhost:8000/api/json/${filename.value}`);
+    response.value = res.data;
+  } catch (error) {
+    console.error("Error eliminando archivo JSON:", error);
+    response.value = { error: "No se pudo eliminar el archivo JSON." };
   }
 };
 </script>
@@ -116,11 +186,19 @@ const deleteFile = async () => {
       </aside>
       <div>
         <div class="buttons">
-          <button @click="getFiles">Get Files</button>
-          <button @click="storeFile">Store</button>
-          <button @click="showFile">Show</button>
-          <button @click="updateFile">Update</button>
-          <button @click="deleteFile">Delete</button>
+          <!-- Botones para Class Storage -->
+          <button @click="getFiles">Get Files (Hello)</button>
+          <button @click="storeFile">Store (Hello)</button>
+          <button @click="showFile">Show (Hello)</button>
+          <button @click="updateFile">Update (Hello)</button>
+          <button @click="deleteFile">Delete (Hello)</button>
+
+          <!-- Botones para JSON -->
+          <button @click="getJsonFiles">Get Files (JSON)</button>
+          <button @click="storeJsonFile">Store (JSON)</button>
+          <button @click="showJsonFile">Show (JSON)</button>
+          <button @click="updateJsonFile">Update (JSON)</button>
+          <button @click="deleteJsonFile">Delete (JSON)</button>
         </div>
         <textarea
           placeholder="Respuesta del servidor"
