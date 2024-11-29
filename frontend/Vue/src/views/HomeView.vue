@@ -1,126 +1,171 @@
+<template>
+  <main>
+    <header>
+      <h1>PR UD 2</h1>
+    </header>
+    <section>
+      <div class="container">
+        <!-- Class Storage Box -->
+        <div class="box">
+          <h2>Class Storage</h2>
+          <input v-model="filename" type="text" placeholder="Enter filename" />
+          <textarea v-model="inputData" placeholder="Enter content"></textarea>
+          <button @click="getClassStorageFiles">Get Files (Hello)</button>
+          <button @click="storeClassStorageFile">Store (Hello)</button>
+          <button @click="showClassStorageFile">Show (Hello)</button>
+          <button @click="updateClassStorageFile">Update (Hello)</button>
+          <button @click="deleteClassStorageFile">Delete (Hello)</button>
+        </div>
+
+     <!-- JSON Box -->
+     <div class="box">
+      <h2>JSON</h2>
+      <input v-model="filename" type="text" placeholder="Enter filename" />
+      <textarea v-model="inputData" placeholder="Enter content"></textarea>
+      <button @click="getJsonFiles">Get Files (JSON)</button>
+      <button @click="storeJsonFile">Store (JSON)</button>
+      <button @click="showJsonFile">Show (JSON)</button>
+      <button @click="updateJsonFile">Update (JSON)</button>
+      <button @click="deleteJsonFile">Delete (JSON)</button>
+    </div>
+
+    <!-- CSV Box -->
+    <div class="box">
+      <h2>CSV</h2>
+      <input v-model="filename" type="text" placeholder="Enter filename" />
+      <textarea v-model="inputData" placeholder="Enter content"></textarea>
+      <button @click="getCsvFiles">Get Files (CSV)</button>
+      <button @click="storeCsvFile">Store (CSV)</button>
+      <button @click="showCsvFile">Show (CSV)</button>
+      <button @click="updateCsvFile">Update (CSV)</button>
+      <button @click="deleteCsvFile">Delete (CSV)</button>
+    </div>
+  </div>
+  <textarea readonly>{{ JSON.stringify(response, null, 2) }}</textarea>
+</section>
+  </main>
+</template>
+
 <script setup>
 import { ref } from "vue";
-import axios from "axios"; // Asegúrate de instalar axios: npm install axios
+import axios from "axios";
 
-// Opciones de almacenamiento
-const storageOptions = ["Class Storage", "JSON", "CSV"];
-const selectedStorage = ref("Class Storage");
-
-// Campos de entrada
 const filename = ref("");
 const inputData = ref("");
-
-// Respuesta inicial (vacía)
 const response = ref({});
 
-// Funciones para los archivos en **Class Storage**
-const getFiles = async () => {
+// CSV Operations
+const getCsvFiles = async () => {
   try {
-    const res = await axios.get("http://localhost:8000/api/hello"); // Llama a la API REST de Hello
+    const res = await axios.get("http://localhost:8000/api/csv");
     response.value = res.data;
   } catch (error) {
-    console.error("Error obteniendo archivos:", error);
-    response.value = { error: "No se pudo obtener la lista de archivos." };
+    console.error("Error getting CSV files:", error);
+    response.value = { error: error.response?.data?.mensaje || "Could not get files" };
   }
 };
 
-const storeFile = async () => {
-  if (!filename.value.trim() || !inputData.value.trim()) {
-    response.value = { error: "El nombre del archivo y el contenido son obligatorios." };
+const storeCsvFile = async () => {
+  if (!filename.value || !inputData.value) {
+    response.value = { error: "Filename and content are required" };
     return;
   }
 
   try {
-    const res = await axios.post("http://localhost:8000/api/hello", {
+    const res = await axios.post("http://localhost:8000/api/csv", {
       filename: filename.value,
       content: inputData.value,
     });
     response.value = res.data;
+    await getCsvFiles(); // Actualiza la lista de archivos almacenados.
   } catch (error) {
-    console.error("Error almacenando archivo:", error);
-    response.value = { error: "No se pudo almacenar el archivo." };
+    console.error("Error storing CSV file:", error);
+    response.value = { error: error.response?.data?.mensaje || "Could not store file" };
   }
 };
 
-const showFile = async () => {
-  if (!filename.value.trim()) {
-    response.value = { error: "El nombre del archivo es obligatorio." };
+
+const showCsvFile = async () => {
+  if (!filename.value) {
+    response.value = { error: "Filename is required" };
     return;
   }
 
   try {
-    const res = await axios.get(`http://localhost:8000/api/hello/${filename.value}`);
+    const res = await axios.get(`http://localhost:8000/api/csv/${filename.value}`);
     response.value = res.data;
   } catch (error) {
-    console.error("Error mostrando archivo:", error);
-    response.value = { error: "No se pudo mostrar el archivo." };
+    console.error("Error showing CSV file:", error);
+    response.value = { error: error.response?.data?.mensaje || "Could not show file" };
   }
 };
 
-const updateFile = async () => {
-  if (!filename.value.trim() || !inputData.value.trim()) {
-    response.value = { error: "El nombre del archivo y el contenido son obligatorios para actualizar." };
+const updateCsvFile = async () => {
+  if (!filename.value || !inputData.value) {
+    response.value = { error: "Filename and content are required" };
     return;
   }
 
   try {
-    const res = await axios.put(`http://localhost:8000/api/hello/${filename.value}`, {
-      content: inputData.value,
+    const res = await axios.put(`http://localhost:8000/api/csv/${filename.value}`, {
+      content: inputData.value
     });
     response.value = res.data;
   } catch (error) {
-    console.error("Error actualizando archivo:", error);
-    response.value = { error: "No se pudo actualizar el archivo." };
+    console.error("Error updating CSV file:", error);
+    response.value = { error: error.response?.data?.mensaje || "Could not update file" };
   }
 };
 
-const deleteFile = async () => {
-  if (!filename.value.trim()) {
-    response.value = { error: "El nombre del archivo es obligatorio para eliminar." };
+const deleteCsvFile = async () => {
+  if (!filename.value) {
+    response.value = { error: "Filename is required" };
     return;
   }
 
   try {
-    const res = await axios.delete(`http://localhost:8000/api/hello/${filename.value}`);
+    const res = await axios.delete(`http://localhost:8000/api/csv/${filename.value}`);
     response.value = res.data;
+    await getCsvFiles();
   } catch (error) {
-    console.error("Error eliminando archivo:", error);
-    response.value = { error: "No se pudo eliminar el archivo." };
+    console.error("Error deleting CSV file:", error);
+    response.value = { error: error.response?.data?.mensaje || "Could not delete file" };
   }
 };
 
-// Funciones para los archivos en **JSON**
+// JSON Operations
 const getJsonFiles = async () => {
   try {
-    const res = await axios.get("http://localhost:8000/api/json"); // Llama a la API REST para obtener la lista de archivos JSON
+    const res = await axios.get("http://localhost:8000/api/json");
     response.value = res.data;
   } catch (error) {
-    console.error("Error obteniendo archivos JSON:", error);
-    response.value = { error: "No se pudo obtener la lista de archivos JSON." };
+    console.error("Error getting JSON files:", error);
+    response.value = { error: error.response?.data?.mensaje || "Could not get files" };
   }
 };
 
 const storeJsonFile = async () => {
-  if (!filename.value.trim() || !inputData.value.trim()) {
-    response.value = { error: "El nombre del archivo y el contenido son obligatorios." };
+  if (!filename.value || !inputData.value) {
+    response.value = { error: "Filename and content are required" };
     return;
   }
 
   try {
     const res = await axios.post("http://localhost:8000/api/json", {
       filename: filename.value,
-      content: inputData.value,
+      content: inputData.value
     });
     response.value = res.data;
+    await getJsonFiles();
   } catch (error) {
-    console.error("Error almacenando archivo JSON:", error);
-    response.value = { error: "No se pudo almacenar el archivo JSON." };
+    console.error("Error storing JSON file:", error);
+    response.value = { error: error.response?.data?.mensaje || "Could not store file" };
   }
 };
 
 const showJsonFile = async () => {
-  if (!filename.value.trim()) {
-    response.value = { error: "El nombre del archivo JSON es obligatorio." };
+  if (!filename.value) {
+    response.value = { error: "Filename is required" };
     return;
   }
 
@@ -128,96 +173,122 @@ const showJsonFile = async () => {
     const res = await axios.get(`http://localhost:8000/api/json/${filename.value}`);
     response.value = res.data;
   } catch (error) {
-    console.error("Error mostrando archivo JSON:", error);
-    response.value = { error: "No se pudo mostrar el archivo JSON." };
+    console.error("Error showing JSON file:", error);
+    response.value = { error: error.response?.data?.mensaje || "Could not show file" };
   }
 };
 
 const updateJsonFile = async () => {
-  if (!filename.value.trim() || !inputData.value.trim()) {
-    response.value = { error: "El nombre del archivo y el contenido son obligatorios para actualizar." };
+  if (!filename.value || !inputData.value) {
+    response.value = { error: "Filename and content are required" };
     return;
   }
 
   try {
     const res = await axios.put(`http://localhost:8000/api/json/${filename.value}`, {
-      content: inputData.value,
+      content: inputData.value
     });
     response.value = res.data;
   } catch (error) {
-    console.error("Error actualizando archivo JSON:", error);
-    response.value = { error: "No se pudo actualizar el archivo JSON." };
+    console.error("Error updating JSON file:", error);
+    response.value = { error: error.response?.data?.mensaje || "Could not update file" };
   }
 };
 
 const deleteJsonFile = async () => {
-  if (!filename.value.trim()) {
-    response.value = { error: "El nombre del archivo JSON es obligatorio para eliminar." };
+  if (!filename.value) {
+    response.value = { error: "Filename is required" };
     return;
   }
 
   try {
     const res = await axios.delete(`http://localhost:8000/api/json/${filename.value}`);
     response.value = res.data;
+    await getJsonFiles();
   } catch (error) {
-    console.error("Error eliminando archivo JSON:", error);
-    response.value = { error: "No se pudo eliminar el archivo JSON." };
+    console.error("Error deleting JSON file:", error);
+    response.value = { error: error.response?.data?.mensaje || "Could not delete file" };
+  }
+};
+
+// Class Storage Operations
+const getClassStorageFiles = async () => {
+  try {
+    const res = await axios.get("http://localhost:8000/api/hello");
+    response.value = res.data;
+  } catch (error) {
+    console.error("Error getting Class Storage files:", error);
+    response.value = { error: error.response?.data?.mensaje || "Could not get files" };
+  }
+};
+
+const storeClassStorageFile = async () => {
+  if (!filename.value || !inputData.value) {
+    response.value = { error: "Filename and content are required" };
+    return;
+  }
+
+  try {
+    const res = await axios.post("http://localhost:8000/api/hello", {
+      filename: filename.value,
+      content: inputData.value
+    });
+    response.value = res.data;
+    await getClassStorageFiles();
+  } catch (error) {
+    console.error("Error storing Class Storage file:", error);
+    response.value = { error: error.response?.data?.mensaje || "Could not store file" };
+  }
+};
+
+const showClassStorageFile = async () => {
+  if (!filename.value) {
+    response.value = { error: "Filename is required" };
+    return;
+  }
+
+  try {
+    const res = await axios.get(`http://localhost:8000/api/hello/${filename.value}`);
+    response.value = res.data;
+  } catch (error) {
+    console.error("Error showing Class Storage file:", error);
+    response.value = { error: error.response?.data?.mensaje || "Could not show file" };
+  }
+};
+
+const updateClassStorageFile = async () => {
+  if (!filename.value || !inputData.value) {
+    response.value = { error: "Filename and content are required" };
+    return;
+  }
+
+  try {
+    const res = await axios.put(`http://localhost:8000/api/hello/${filename.value}`, {
+      content: inputData.value
+    });
+    response.value = res.data;
+  } catch (error) {
+    console.error("Error updating Class Storage file:", error);
+    response.value = { error: error.response?.data?.mensaje || "Could not update file" };
+  }
+};
+
+const deleteClassStorageFile = async () => {
+  if (!filename.value) {
+    response.value = { error: "Filename is required" };
+    return;
+  }
+
+  try {
+    const res = await axios.delete(`http://localhost:8000/api/hello/${filename.value}`);
+    response.value = res.data;
+    await getClassStorageFiles();
+  } catch (error) {
+    console.error("Error deleting Class Storage file:", error);
+    response.value = { error: error.response?.data?.mensaje || "Could not delete file" };
   }
 };
 </script>
-
-<template>
-  <main>
-    <header>
-      <h1>PR UD 2</h1>
-    </header>
-    <section>
-      <aside>
-        <ul>
-          <li
-            v-for="option in storageOptions"
-            :key="option"
-            :class="{ active: selectedStorage === option }"
-            @click="selectedStorage = option"
-          >
-            {{ option }}
-          </li>
-        </ul>
-      </aside>
-      <div>
-        <div class="buttons">
-          <!-- Botones para Class Storage -->
-          <button @click="getFiles">Get Files (Hello)</button>
-          <button @click="storeFile">Store (Hello)</button>
-          <button @click="showFile">Show (Hello)</button>
-          <button @click="updateFile">Update (Hello)</button>
-          <button @click="deleteFile">Delete (Hello)</button>
-
-          <!-- Botones para JSON -->
-          <button @click="getJsonFiles">Get Files (JSON)</button>
-          <button @click="storeJsonFile">Store (JSON)</button>
-          <button @click="showJsonFile">Show (JSON)</button>
-          <button @click="updateJsonFile">Update (JSON)</button>
-          <button @click="deleteJsonFile">Delete (JSON)</button>
-        </div>
-        <textarea
-          placeholder="Respuesta del servidor"
-          readonly
-        >{{ JSON.stringify(response, null, 2) }}</textarea>
-        <input
-          type="text"
-          v-model="filename"
-          placeholder="Nombre del archivo"
-        />
-        <textarea
-          v-model="inputData"
-          placeholder="Contenido del archivo"
-        ></textarea>
-        <button>Send</button>
-      </div>
-    </section>
-  </main>
-</template>
 
 <style scoped>
 main {
@@ -225,7 +296,7 @@ main {
   flex-direction: column;
   align-items: center;
   font-family: Arial, sans-serif;
-  padding: 1rem;
+  padding: 2rem;
 }
 
 header h1 {
@@ -234,52 +305,38 @@ header h1 {
 
 section {
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 2rem;
 }
 
-aside {
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.box {
   border: 1px solid #ddd;
   padding: 1rem;
+  width: 300px;
+  text-align: center;
 }
 
-aside ul {
-  list-style: none;
-  padding: 0;
-}
-
-aside li {
-  padding: 0.5rem;
-  cursor: pointer;
-}
-
-aside li.active {
-  font-weight: bold;
-  color: white;
-  background-color: #007bff;
-}
-
-.buttons {
-  display: flex;
-  gap: 0.5rem;
+h2 {
+  font-size: 1.5rem;
   margin-bottom: 1rem;
 }
 
-textarea {
-  width: 100%;
-  height: 100px;
-  margin-bottom: 1rem;
-}
-
-input[type="text"] {
+input, textarea {
   width: 100%;
   padding: 0.5rem;
   margin-bottom: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
 }
 
 button {
-  padding: 0.5rem 1rem;
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
   border: 1px solid #007bff;
   background-color: #007bff;
   color: white;
@@ -289,5 +346,11 @@ button {
 
 button:hover {
   background-color: #0056b3;
+}
+
+textarea[readonly] {
+  width: 100%;
+  height: 200px;
+  margin-top: 2rem;
 }
 </style>
