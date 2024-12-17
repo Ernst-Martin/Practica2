@@ -13,5 +13,6 @@
 14. ejecuta composer install (para prevenir errores aunque ya esta instalado en el equipo)
 15. ejecuta cp .env.example .env
 16. ejecuta php artisan key:generate
-17. ejecuta php artisan serve ( para que funcione el servidor con los controllers)
-18. entramos en nuestro localhost http://localhost:5173/
+17. ejecuta cp .env.ci .env
+18. ejecuta php artisan serve ( para que funcione el servidor con los controllers)
+19. entramos en nuestro localhost http://localhost:5173/
